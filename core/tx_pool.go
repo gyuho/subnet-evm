@@ -593,6 +593,7 @@ func (pool *TxPool) Pending(enforceTips bool) map[common.Address]types.Transacti
 	pool.mu.Lock()
 	defer pool.mu.Unlock()
 
+	total := 0
 	pending := make(map[common.Address]types.Transactions)
 	for addr, list := range pool.pending {
 		txs := list.Flatten()
@@ -607,8 +608,13 @@ func (pool *TxPool) Pending(enforceTips bool) map[common.Address]types.Transacti
 			}
 		}
 		if len(txs) > 0 {
+			total += len(txs)
 			pending[addr] = txs
 		}
+	}
+
+	if len(pending) > 0 {
+		fmt.Println(time.Now().String()[11:25], "[G subnet-evm] TxPool.Pending", "len(pending)", len(pending), "/ total", total)
 	}
 	return pending
 }
@@ -708,6 +714,10 @@ func (pool *TxPool) checkTxState(from common.Address, tx *types.Transaction) err
 // validateTx checks whether a transaction is valid according to the consensus
 // rules and adheres to some heuristic limits of the local node (price and size).
 func (pool *TxPool) validateTx(tx *types.Transaction, local bool) error {
+	println()
+	fmt.Println(time.Now().String()[11:25], "[G subnet-evm] TxPool.validateTx 1 tx.Hash", tx.Hash())
+	println()
+
 	// Accept only legacy transactions until EIP-2718/2930 activates.
 	if !pool.eip2718 && tx.Type() != types.LegacyTxType {
 		return ErrTxTypeNotSupported
@@ -768,6 +778,11 @@ func (pool *TxPool) validateTx(tx *types.Transaction, local bool) error {
 	if txGas := tx.Gas(); txGas < intrGas {
 		return fmt.Errorf("%w: address %v tx gas (%v) < intrinsic gas (%v)", ErrIntrinsicGas, from.Hex(), tx.Gas(), intrGas)
 	}
+
+	println()
+	fmt.Println(time.Now().String()[11:25], "[G subnet-evm] TxPool.validateTx 2 tx.Hash", tx.Hash())
+	println()
+
 	return nil
 }
 
@@ -781,6 +796,10 @@ func (pool *TxPool) validateTx(tx *types.Transaction, local bool) error {
 func (pool *TxPool) add(tx *types.Transaction, local bool) (replaced bool, err error) {
 	// If the transaction is already known, discard it
 	hash := tx.Hash()
+
+	println()
+	fmt.Println(time.Now().String()[11:25], "[G subnet-evm] TxPool.add 1 tx.Hash", hash)
+	println()
 	if pool.all.Get(hash) != nil {
 		log.Trace("Discarding already known transaction", "hash", hash)
 		knownTxMeter.Mark(1)
@@ -873,6 +892,10 @@ func (pool *TxPool) add(tx *types.Transaction, local bool) (replaced bool, err e
 		localGauge.Inc(1)
 	}
 	pool.journalTx(from, tx)
+
+	println()
+	fmt.Println(time.Now().String()[11:25], "[G subnet-evm] TxPool.add 2 tx.Hash", hash, "from", from.Hex())
+	println()
 
 	log.Trace("Pooled new future transaction", "hash", hash, "from", from, "to", tx.To())
 	return replaced, nil
@@ -978,6 +1001,9 @@ func (pool *TxPool) AddLocals(txs []*types.Transaction) []error {
 // AddLocal enqueues a single local transaction into the pool if it is valid. This is
 // a convenience wrapper aroundd AddLocals.
 func (pool *TxPool) AddLocal(tx *types.Transaction) error {
+	println()
+	fmt.Println(time.Now().String()[11:25], "[G subnet-evm] TxPool.AddLocal tx.Hash", tx.Hash())
+	println()
 	errs := pool.AddLocals([]*types.Transaction{tx})
 	return errs[0]
 }
@@ -988,11 +1014,17 @@ func (pool *TxPool) AddLocal(tx *types.Transaction) error {
 // This method is used to add transactions from the p2p network and does not wait for pool
 // reorganization and internal event propagation.
 func (pool *TxPool) AddRemotes(txs []*types.Transaction) []error {
+	println()
+	fmt.Println(time.Now().String()[11:25], "[G subnet-evm] TxPool.AddRemotes len(txs)", len(txs))
+	println()
 	return pool.addTxs(txs, false, false)
 }
 
 // This is like AddRemotes, but waits for pool reorganization. Tests use this method.
 func (pool *TxPool) AddRemotesSync(txs []*types.Transaction) []error {
+	println()
+	fmt.Println(time.Now().String()[11:25], "[G subnet-evm] TxPool.AddRemotesSync len(txs)", len(txs))
+	println()
 	return pool.addTxs(txs, false, true)
 }
 

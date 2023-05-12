@@ -4,6 +4,7 @@
 package evm
 
 import (
+	"fmt"
 	"math/big"
 	"sync"
 	"time"
@@ -164,6 +165,9 @@ func (n *pushGossiper) queueExecutableTxs(
 func (n *pushGossiper) queueRegossipTxs() types.Transactions {
 	// Fetch all pending transactions
 	pending := n.txPool.Pending(true)
+	if len(pending) > 0 {
+		fmt.Println(time.Now().String()[11:25], "[G subnet-evm] pushGossiper.queueRegossipTxs 1")
+	}
 
 	// Split the pending transactions into locals and remotes
 	localTxs := make(map[common.Address]types.Transactions)
@@ -179,7 +183,7 @@ func (n *pushGossiper) queueRegossipTxs() types.Transactions {
 	tip := n.blockchain.CurrentBlock()
 	state, err := n.blockchain.StateAt(tip.Root())
 	if err != nil || state == nil {
-		log.Debug(
+		log.Warn(
 			"could not get state at tip",
 			"tip", tip.Hash(),
 			"err", err,
@@ -192,6 +196,11 @@ func (n *pushGossiper) queueRegossipTxs() types.Transactions {
 	localQueued := n.queueExecutableTxs(state, tip.BaseFee(), localTxs, rgFrequency, rgMaxTxs, rgTxsPerAddr)
 	localCount := len(localQueued)
 	n.stats.IncEthTxsRegossipQueuedLocal(localCount)
+
+	println()
+	fmt.Println(time.Now().String()[11:25], "[G subnet-evm] pushGossiper.queueRegossipTxs 2", "localCount", localCount, "RegossipMaxTxs", rgMaxTxs)
+	println()
+
 	if localCount >= rgMaxTxs {
 		n.stats.IncEthTxsRegossipQueued()
 		return localQueued
@@ -240,6 +249,15 @@ func (n *pushGossiper) awaitEthTxGossip() {
 			regossipTicker         = time.NewTicker(n.config.RegossipFrequency.Duration)
 			priorityRegossipTicker = time.NewTicker(n.config.PriorityRegossipFrequency.Duration)
 		)
+
+		println()
+		fmt.Println(time.Now().String()[11:25], "[G subnet-evm] pushGossiper.awaitEthTxGossip",
+			"/ txsGossipInterval", txsGossipInterval,
+			"/ n.config.RegossipFrequency.Duration", n.config.RegossipFrequency.Duration,
+			"/ n.config.PriorityRegossipFrequency.Duration", n.config.PriorityRegossipFrequency.Duration,
+		)
+		println()
+
 		defer func() {
 			gossipTicker.Stop()
 			regossipTicker.Stop()
@@ -302,6 +320,10 @@ func (n *pushGossiper) sendTxs(txs []*types.Transaction) error {
 		return nil
 	}
 
+	println()
+	fmt.Println(time.Now().String()[11:25], "[G subnet-evm] pushGossiper.gossipTxs triggers sendTxs to gossip 1", "len(txs)", len(txs))
+	println()
+
 	txBytes, err := rlp.EncodeToBytes(txs)
 	if err != nil {
 		return err
@@ -319,6 +341,11 @@ func (n *pushGossiper) sendTxs(txs []*types.Transaction) error {
 		"size(txs)", len(msg.Txs),
 	)
 	n.stats.IncEthTxsGossipSent()
+
+	println()
+	fmt.Println(time.Now().String()[11:25], "[G subnet-evm] pushGossiper.gossipTxs triggers sendTxs to gossip 2", "size(txs)", len(msg.Txs))
+	println()
+
 	return n.client.Gossip(msgBytes)
 }
 
@@ -326,6 +353,10 @@ func (n *pushGossiper) gossipTxs(force bool) (int, error) {
 	if (!force && time.Since(n.lastGossiped) < txsGossipInterval) || len(n.txsToGossip) == 0 {
 		return 0, nil
 	}
+	println()
+	fmt.Println(time.Now().String()[11:25], "[G subnet-evm] pushGossiper.gossipTxs 1", "force", force)
+	println()
+
 	n.lastGossiped = time.Now()
 	txs := make([]*types.Transaction, 0, len(n.txsToGossip))
 	for _, tx := range n.txsToGossip {
@@ -419,6 +450,10 @@ func NewGossipHandler(vm *VM, stats GossipReceivedStats) *GossipHandler {
 }
 
 func (h *GossipHandler) HandleTxs(nodeID ids.NodeID, msg message.TxsGossip) error {
+	println()
+	fmt.Println(time.Now().String()[11:25], "[GYUHO DEBUG avalanchego -> subnet-evm] INCOMING AppGossip triggering GossipHandler.HandleTxs 1 from nodeID", nodeID)
+	println()
+
 	log.Trace(
 		"AppGossip called with TxsGossip",
 		"peerID", nodeID,
@@ -443,6 +478,11 @@ func (h *GossipHandler) HandleTxs(nodeID ids.NodeID, msg message.TxsGossip) erro
 		)
 		return nil
 	}
+
+	println()
+	fmt.Println(time.Now().String()[11:25], "[GYUHO DEBUG avalanchego -> subnet-evm] INCOMING AppGossip triggering GossipHandler.HandleTxs 2 len(txs)", len(txs), "from", nodeID)
+	println()
+
 	h.stats.IncEthTxsGossipReceived()
 	errs := h.txPool.AddRemotes(txs)
 	for i, err := range errs {
