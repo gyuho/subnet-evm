@@ -169,9 +169,7 @@ func (n *network) sendAppRequest(nodeID ids.NodeID, request []byte, responseHand
 		return nil
 	}
 
-	println()
 	fmt.Println(time.Now().String()[11:25], "[G subnet-evm] sendAppRequest", "to", nodeID)
-	println()
 
 	log.Debug("sending request to peer", "nodeID", nodeID, "requestLen", len(request))
 	n.peers.TrackPeer(nodeID)
@@ -335,9 +333,7 @@ func (n *network) AppRequest(ctx context.Context, nodeID ids.NodeID, requestID u
 		return nil
 	}
 
-	println()
 	fmt.Println(time.Now().String()[11:25], "[GYUHO DEBUG avalanchego -> subnet-evm] INCOMING AppRequest", "from", nodeID)
-	println()
 
 	log.Debug("received AppRequest from node", "nodeID", nodeID, "requestID", requestID, "requestLen", len(request))
 
@@ -382,9 +378,7 @@ func (n *network) AppResponse(_ context.Context, nodeID ids.NodeID, requestID ui
 		return nil
 	}
 
-	println()
 	fmt.Println(time.Now().String()[11:25], "[G subnet-evm] INCOMING AppResponse", "from", nodeID)
-	println()
 
 	log.Debug("received AppResponse from peer", "nodeID", nodeID, "requestID", requestID)
 
@@ -487,9 +481,7 @@ func (n *network) AppGossip(_ context.Context, nodeID ids.NodeID, gossipBytes []
 		return nil
 	}
 
-	println()
 	fmt.Println(time.Now().String()[11:25], "[GYUHO DEBUG avalanchego -> subnet-evm] network.AppGossip received 1", "size(gossipBytes)", len(gossipBytes))
-	println()
 
 	var gossipMsg message.GossipMessage
 	if _, err := n.codec.Unmarshal(gossipBytes, &gossipMsg); err != nil {
@@ -497,9 +489,7 @@ func (n *network) AppGossip(_ context.Context, nodeID ids.NodeID, gossipBytes []
 		return nil
 	}
 
-	println()
 	fmt.Println(time.Now().String()[11:25], "[GYUHO DEBUG avalanchego -> subnet-evm] network.AppGossip received 2", "from", nodeID)
-	println()
 
 	log.Debug("processing AppGossip from node", "nodeID", nodeID, "msg", gossipMsg)
 	return gossipMsg.Handle(n.gossipHandler, nodeID)

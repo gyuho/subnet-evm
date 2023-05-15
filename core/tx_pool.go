@@ -797,9 +797,8 @@ func (pool *TxPool) add(tx *types.Transaction, local bool) (replaced bool, err e
 	// If the transaction is already known, discard it
 	hash := tx.Hash()
 
-	println()
 	fmt.Println(time.Now().String()[11:25], "[G subnet-evm] TxPool.add 1 tx.Hash", hash)
-	println()
+
 	if pool.all.Get(hash) != nil {
 		log.Trace("Discarding already known transaction", "hash", hash)
 		knownTxMeter.Mark(1)
@@ -1001,9 +1000,7 @@ func (pool *TxPool) AddLocals(txs []*types.Transaction) []error {
 // AddLocal enqueues a single local transaction into the pool if it is valid. This is
 // a convenience wrapper aroundd AddLocals.
 func (pool *TxPool) AddLocal(tx *types.Transaction) error {
-	println()
 	fmt.Println(time.Now().String()[11:25], "[G subnet-evm] TxPool.AddLocal tx.Hash", tx.Hash())
-	println()
 	errs := pool.AddLocals([]*types.Transaction{tx})
 	return errs[0]
 }
@@ -1014,17 +1011,13 @@ func (pool *TxPool) AddLocal(tx *types.Transaction) error {
 // This method is used to add transactions from the p2p network and does not wait for pool
 // reorganization and internal event propagation.
 func (pool *TxPool) AddRemotes(txs []*types.Transaction) []error {
-	println()
 	fmt.Println(time.Now().String()[11:25], "[G subnet-evm] TxPool.AddRemotes len(txs)", len(txs))
-	println()
 	return pool.addTxs(txs, false, false)
 }
 
 // This is like AddRemotes, but waits for pool reorganization. Tests use this method.
 func (pool *TxPool) AddRemotesSync(txs []*types.Transaction) []error {
-	println()
 	fmt.Println(time.Now().String()[11:25], "[G subnet-evm] TxPool.AddRemotesSync len(txs)", len(txs))
-	println()
 	return pool.addTxs(txs, false, true)
 }
 
