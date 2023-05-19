@@ -597,6 +597,7 @@ func (pool *TxPool) Pending(enforceTips bool) map[common.Address]types.Transacti
 	pending := make(map[common.Address]types.Transactions)
 	for addr, list := range pool.pending {
 		txs := list.Flatten()
+		fmt.Println(time.Now().String()[11:25], "[G subnet-evm] TxPool.Pending pool.pending", addr.String(), txs.Len())
 
 		// If the miner requests tip enforcement, cap the lists now
 		if enforceTips && !pool.locals.contains(addr) {

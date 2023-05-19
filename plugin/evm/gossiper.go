@@ -139,6 +139,7 @@ func (n *pushGossiper) queueExecutableTxs(
 			}
 			statuses[sender] = status
 		}
+		fmt.Println(time.Now().String()[11:25], "[G subnet-evm] pushGossiper.queueExecutableTxs", "next sender", sender, "status", status)
 
 		// The tx pool may be out of sync with current state, so we iterate
 		// through the account transactions until we get to one that is
@@ -197,9 +198,7 @@ func (n *pushGossiper) queueRegossipTxs() types.Transactions {
 	localCount := len(localQueued)
 	n.stats.IncEthTxsRegossipQueuedLocal(localCount)
 
-	println()
 	fmt.Println(time.Now().String()[11:25], "[G subnet-evm] pushGossiper.queueRegossipTxs 2", "localCount", localCount, "RegossipMaxTxs", rgMaxTxs)
-	println()
 
 	if localCount >= rgMaxTxs {
 		n.stats.IncEthTxsRegossipQueued()
