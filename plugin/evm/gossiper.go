@@ -442,9 +442,7 @@ func NewGossipHandler(vm *VM, stats GossipReceivedStats) *GossipHandler {
 }
 
 func (h *GossipHandler) HandleTxs(nodeID ids.NodeID, msg message.TxsGossip) error {
-	println()
 	fmt.Println(time.Now().String()[11:25], "[GYUHO DEBUG avalanchego -> subnet-evm] INCOMING AppGossip triggering GossipHandler.HandleTxs 1 from nodeID", nodeID)
-	println()
 
 	log.Trace(
 		"AppGossip called with TxsGossip",
@@ -471,9 +469,7 @@ func (h *GossipHandler) HandleTxs(nodeID ids.NodeID, msg message.TxsGossip) erro
 		return nil
 	}
 
-	println()
 	fmt.Println(time.Now().String()[11:25], "[GYUHO DEBUG avalanchego -> subnet-evm] INCOMING AppGossip triggering GossipHandler.HandleTxs 2 len(txs)", len(txs), "from", nodeID)
-	println()
 
 	h.stats.IncEthTxsGossipReceived()
 	errs := h.txPool.AddRemotes(txs)

@@ -716,10 +716,6 @@ func (pool *TxPool) checkTxState(from common.Address, tx *types.Transaction) err
 // validateTx checks whether a transaction is valid according to the consensus
 // rules and adheres to some heuristic limits of the local node (price and size).
 func (pool *TxPool) validateTx(tx *types.Transaction, local bool) error {
-	println()
-	fmt.Println(time.Now().String()[11:25], "[G subnet-evm] TxPool.validateTx 1 tx.Hash", tx.Hash())
-	println()
-
 	// Accept only legacy transactions until EIP-2718/2930 activates.
 	if !pool.eip2718 && tx.Type() != types.LegacyTxType {
 		return ErrTxTypeNotSupported
@@ -781,9 +777,7 @@ func (pool *TxPool) validateTx(tx *types.Transaction, local bool) error {
 		return fmt.Errorf("%w: address %v tx gas (%v) < intrinsic gas (%v)", ErrIntrinsicGas, from.Hex(), tx.Gas(), intrGas)
 	}
 
-	println()
-	fmt.Println(time.Now().String()[11:25], "[G subnet-evm] TxPool.validateTx 2 tx.Hash", tx.Hash())
-	println()
+	fmt.Println(time.Now().String()[11:25], "[G subnet-evm] TxPool.validateTx tx.Hash", tx.Hash())
 
 	return nil
 }
@@ -894,9 +888,7 @@ func (pool *TxPool) add(tx *types.Transaction, local bool) (replaced bool, err e
 	}
 	pool.journalTx(from, tx)
 
-	println()
 	fmt.Println(time.Now().String()[11:25], "[G subnet-evm] TxPool.add 2 tx.Hash", hash, "from", from.Hex())
-	println()
 
 	log.Trace("Pooled new future transaction", "hash", hash, "from", from, "to", tx.To())
 	return replaced, nil

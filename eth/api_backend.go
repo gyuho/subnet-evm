@@ -310,9 +310,7 @@ func (b *EthAPIBackend) SendTx(ctx context.Context, signedTx *types.Transaction)
 		return err
 	}
 
-	println()
 	fmt.Println(time.Now().String()[11:25], "[G subnet-evm] EthAPIBackend.SendTx signedTx.Hash", signedTx.Hash())
-	println()
 	return b.eth.txPool.AddLocal(signedTx)
 }
 
@@ -323,9 +321,7 @@ func (b *EthAPIBackend) GetPoolTransactions() (types.Transactions, error) {
 		txs = append(txs, batch...)
 	}
 
-	println()
 	fmt.Println(time.Now().String()[11:25], "[G subnet-evm] EthAPIBackend.GetPoolTransactions len(txs)", len(txs))
-	println()
 	return txs, nil
 }
 

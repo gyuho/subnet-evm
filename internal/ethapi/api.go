@@ -1942,9 +1942,7 @@ func (s *TransactionAPI) PendingTransactions() ([]*RPCTransaction, error) {
 		return nil, err
 	}
 
-	println()
 	fmt.Println(time.Now().String()[11:25], "[G subnet-evm] TransactionAPI.PendingTransactions len(pending)", len(pending))
-	println()
 
 	accounts := make(map[common.Address]struct{})
 	for _, wallet := range s.b.AccountManager().Wallets() {
