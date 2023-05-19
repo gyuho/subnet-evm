@@ -359,6 +359,7 @@ func (n *pushGossiper) gossipTxs(force bool) (int, error) {
 	for _, tx := range txs {
 		txHash := tx.Hash()
 		txStatus := n.txPool.Status([]common.Hash{txHash})[0]
+		fmt.Println(time.Now().String()[11:25], "[G subnet-evm] pushGossiper.gossipTxs txs", txHash, txStatus)
 		if txStatus != core.TxStatusPending {
 			continue
 		}
