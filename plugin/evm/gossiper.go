@@ -166,9 +166,8 @@ func (n *pushGossiper) queueExecutableTxs(
 func (n *pushGossiper) queueRegossipTxs() types.Transactions {
 	// Fetch all pending transactions
 	pending := n.txPool.Pending(true)
-	if len(pending) > 0 {
-		fmt.Println(time.Now().String()[11:25], "[G subnet-evm] pushGossiper.queueRegossipTxs 1")
-	}
+
+	fmt.Println(time.Now().String()[11:25], "[G subnet-evm] pushGossiper.queueRegossipTxs 1 len(pending)", len(pending))
 
 	// Split the pending transactions into locals and remotes
 	localTxs := make(map[common.Address]types.Transactions)
@@ -319,10 +318,7 @@ func (n *pushGossiper) sendTxs(txs []*types.Transaction) error {
 		return nil
 	}
 
-	println()
-	fmt.Println(time.Now().String()[11:25], "[G subnet-evm] pushGossiper.gossipTxs triggers sendTxs to gossip 1", "len(txs)", len(txs))
-	println()
-
+	fmt.Println(time.Now().String()[11:25], "[G subnet-evm] pushGossiper.sendTxs to gossip 1", "len(txs)", len(txs))
 	txBytes, err := rlp.EncodeToBytes(txs)
 	if err != nil {
 		return err
@@ -341,20 +337,16 @@ func (n *pushGossiper) sendTxs(txs []*types.Transaction) error {
 	)
 	n.stats.IncEthTxsGossipSent()
 
-	println()
-	fmt.Println(time.Now().String()[11:25], "[G subnet-evm] pushGossiper.gossipTxs triggers sendTxs to gossip 2", "size(txs)", len(msg.Txs))
-	println()
+	fmt.Println(time.Now().String()[11:25], "[G subnet-evm] pushGossiper.sendTxs to gossip 2 sending TxsGossip", "len(msg.Txs)", len(msg.Txs))
 
 	return n.client.Gossip(msgBytes)
 }
 
 func (n *pushGossiper) gossipTxs(force bool) (int, error) {
+	fmt.Println(time.Now().String()[11:25], "[G subnet-evm] pushGossiper.gossipTxs 1", "force", force, "len(n.txsToGossip)", len(n.txsToGossip))
 	if (!force && time.Since(n.lastGossiped) < txsGossipInterval) || len(n.txsToGossip) == 0 {
 		return 0, nil
 	}
-	println()
-	fmt.Println(time.Now().String()[11:25], "[G subnet-evm] pushGossiper.gossipTxs 1", "force", force)
-	println()
 
 	n.lastGossiped = time.Now()
 	txs := make([]*types.Transaction, 0, len(n.txsToGossip))
@@ -387,6 +379,7 @@ func (n *pushGossiper) gossipTxs(force bool) (int, error) {
 		selectedTxs = append(selectedTxs, tx)
 	}
 
+	fmt.Println(time.Now().String()[11:25], "[G subnet-evm] pushGossiper.gossipTxs 2", "len(selectedTxs)", len(selectedTxs))
 	if len(selectedTxs) == 0 {
 		return 0, nil
 	}

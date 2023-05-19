@@ -595,6 +595,7 @@ func (pool *TxPool) Pending(enforceTips bool) map[common.Address]types.Transacti
 
 	total := 0
 	pending := make(map[common.Address]types.Transactions)
+	fmt.Println(time.Now().String()[11:25], "[G subnet-evm] TxPool.Pending 1", "len(pool.pending)", len(pool.pending))
 	for addr, list := range pool.pending {
 		txs := list.Flatten()
 		fmt.Println(time.Now().String()[11:25], "[G subnet-evm] TxPool.Pending pool.pending", addr.String(), txs.Len())
@@ -615,7 +616,7 @@ func (pool *TxPool) Pending(enforceTips bool) map[common.Address]types.Transacti
 	}
 
 	if len(pending) > 0 {
-		fmt.Println(time.Now().String()[11:25], "[G subnet-evm] TxPool.Pending", "len(pending)", len(pending), "/ total", total)
+		fmt.Println(time.Now().String()[11:25], "[G subnet-evm] TxPool.Pending 2", "len(pending)", len(pending), "/ total", total)
 	}
 	return pending
 }

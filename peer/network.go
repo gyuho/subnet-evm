@@ -466,10 +466,7 @@ func (n *network) Gossip(gossip []byte) error {
 		return nil
 	}
 
-	println()
 	fmt.Println(time.Now().String()[11:25], "[G subnet-evm] network.Gossip", "size(gossip)", len(gossip), "(now calling n.appSender.SendAppGossip)")
-	println()
-
 	return n.appSender.SendAppGossip(context.TODO(), gossip)
 }
 
@@ -481,7 +478,7 @@ func (n *network) AppGossip(_ context.Context, nodeID ids.NodeID, gossipBytes []
 		return nil
 	}
 
-	fmt.Println(time.Now().String()[11:25], "[GYUHO DEBUG avalanchego -> subnet-evm] network.AppGossip received 1", "size(gossipBytes)", len(gossipBytes))
+	fmt.Println(time.Now().String()[11:25], "[G DEBUG avalanchego -> subnet-evm] network.AppGossip received 1", "size(gossipBytes)", len(gossipBytes))
 
 	var gossipMsg message.GossipMessage
 	if _, err := n.codec.Unmarshal(gossipBytes, &gossipMsg); err != nil {
@@ -489,7 +486,7 @@ func (n *network) AppGossip(_ context.Context, nodeID ids.NodeID, gossipBytes []
 		return nil
 	}
 
-	fmt.Println(time.Now().String()[11:25], "[GYUHO DEBUG avalanchego -> subnet-evm] network.AppGossip received 2", "from", nodeID)
+	fmt.Println(time.Now().String()[11:25], "[G DEBUG avalanchego -> subnet-evm] network.AppGossip received 2", "from", nodeID, "msg", gossipMsg)
 
 	log.Debug("processing AppGossip from node", "nodeID", nodeID, "msg", gossipMsg)
 	return gossipMsg.Handle(n.gossipHandler, nodeID)
