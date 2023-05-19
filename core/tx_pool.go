@@ -1103,6 +1103,7 @@ func (pool *TxPool) Status(hashes []common.Hash) []TxStatus {
 	status := make([]TxStatus, len(hashes))
 	for i, hash := range hashes {
 		tx := pool.Get(hash)
+		fmt.Println(time.Now().String()[11:25], "[G subnet-evm] TxPool.Status hash", tx)
 		if tx == nil {
 			continue
 		}
@@ -1143,6 +1144,7 @@ func (pool *TxPool) RemoveTx(hash common.Hash) {
 	pool.mu.Lock()
 	defer pool.mu.Unlock()
 
+	fmt.Println(time.Now().String()[11:25], "[G subnet-evm] TxPool.RemoveTx", hash)
 	pool.removeTx(hash, true)
 }
 

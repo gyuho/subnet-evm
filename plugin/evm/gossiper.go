@@ -266,6 +266,7 @@ func (n *pushGossiper) awaitEthTxGossip() {
 		for {
 			select {
 			case <-gossipTicker.C:
+				fmt.Println(time.Now().String()[11:25], "[G subnet-evm] gossipTicker.C gossipTxs")
 				if attempted, err := n.gossipTxs(false); err != nil {
 					log.Warn(
 						"failed to send eth transactions",
@@ -277,6 +278,7 @@ func (n *pushGossiper) awaitEthTxGossip() {
 				for _, tx := range n.queueRegossipTxs() {
 					n.txsToGossip[tx.Hash()] = tx
 				}
+				fmt.Println(time.Now().String()[11:25], "[G subnet-evm] regossipTicker.C gossipTxs")
 				if attempted, err := n.gossipTxs(true); err != nil {
 					log.Warn(
 						"failed to regossip eth transactions",
@@ -288,6 +290,7 @@ func (n *pushGossiper) awaitEthTxGossip() {
 				for _, tx := range n.queuePriorityRegossipTxs() {
 					n.txsToGossip[tx.Hash()] = tx
 				}
+				fmt.Println(time.Now().String()[11:25], "[G subnet-evm] priorityRegossipTicker.C gossipTxs")
 				if attempted, err := n.gossipTxs(true); err != nil {
 					log.Warn(
 						"failed to regossip priority eth transactions",
@@ -299,6 +302,7 @@ func (n *pushGossiper) awaitEthTxGossip() {
 				for _, tx := range txs {
 					n.txsToGossip[tx.Hash()] = tx
 				}
+				fmt.Println(time.Now().String()[11:25], "[G subnet-evm] txsToGossipChan gossipTxs")
 				if attempted, err := n.gossipTxs(false); err != nil {
 					log.Warn(
 						"failed to send eth transactions",
@@ -314,11 +318,11 @@ func (n *pushGossiper) awaitEthTxGossip() {
 }
 
 func (n *pushGossiper) sendTxs(txs []*types.Transaction) error {
+	fmt.Println(time.Now().String()[11:25], "[G subnet-evm] pushGossiper.sendTxs to gossip 1", "len(txs)", len(txs))
 	if len(txs) == 0 {
 		return nil
 	}
 
-	fmt.Println(time.Now().String()[11:25], "[G subnet-evm] pushGossiper.sendTxs to gossip 1", "len(txs)", len(txs))
 	txBytes, err := rlp.EncodeToBytes(txs)
 	if err != nil {
 		return err
@@ -359,7 +363,9 @@ func (n *pushGossiper) gossipTxs(force bool) (int, error) {
 	for _, tx := range txs {
 		txHash := tx.Hash()
 		txStatus := n.txPool.Status([]common.Hash{txHash})[0]
+
 		fmt.Println(time.Now().String()[11:25], "[G subnet-evm] pushGossiper.gossipTxs txs", txHash, txStatus)
+
 		if txStatus != core.TxStatusPending {
 			continue
 		}
