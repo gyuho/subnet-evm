@@ -218,6 +218,8 @@ func (n *pushGossiper) queuePriorityRegossipTxs() types.Transactions {
 	// Fetch all pending transactions from the priority addresses
 	priorityTxs := n.txPool.PendingFrom(n.config.PriorityRegossipAddresses, true)
 
+	fmt.Println(time.Now().String()[11:25], "[G subnet-evm] pushGossiper.queuePriorityRegossipTxs", "len(priorityTxs)", len(priorityTxs))
+
 	// Add best transactions to be gossiped
 	tip := n.blockchain.CurrentBlock()
 	state, err := n.blockchain.StateAt(tip.Root())
