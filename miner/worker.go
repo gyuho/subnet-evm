@@ -420,6 +420,7 @@ func (w *worker) enforcePredicates(
 				// If the transaction fails the predicate check, we remove the transaction from the mempool
 				// and move all transactions from the same address with a subsequent nonce back to the
 				// future queue of the transaction pool.
+				fmt.Println(time.Now().String()[11:25], "[G subnet-evm] TxPool.RemoveTx due to enforcePredicates", tx.Hash(), "err", err)
 				w.eth.TxPool().RemoveTx(tx.Hash())
 				txs = txs[:i] // Cut off any transactions past the failed predicate in the return value
 				break

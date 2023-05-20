@@ -426,6 +426,7 @@ func (pool *TxPool) loop() {
 				if time.Since(pool.beats[addr]) > pool.config.Lifetime {
 					list := pool.queue[addr].Flatten()
 					for _, tx := range list {
+						fmt.Println(time.Now().String()[11:25], "[G subnet-evm] pool.removeTx(tx.Hash) due to evict.C", tx.Hash())
 						pool.removeTx(tx.Hash(), true)
 					}
 					queuedEvictionMeter.Mark(int64(len(list)))
@@ -501,6 +502,7 @@ func (pool *TxPool) SetGasPrice(price *big.Int) {
 		// pool.priced is sorted by GasFeeCap, so we have to iterate through pool.all instead
 		drop := pool.all.RemotesBelowTip(price)
 		for _, tx := range drop {
+			fmt.Println(time.Now().String()[11:25], "[G subnet-evm] pool.removeTx(tx.Hash) due to SetGasPrice", tx.Hash())
 			pool.removeTx(tx.Hash(), false)
 		}
 		pool.priced.Removed(len(drop))
@@ -844,6 +846,8 @@ func (pool *TxPool) add(tx *types.Transaction, local bool) (replaced bool, err e
 		for _, tx := range drop {
 			log.Trace("Discarding freshly underpriced transaction", "hash", tx.Hash(), "gasTipCap", tx.GasTipCap(), "gasFeeCap", tx.GasFeeCap())
 			underpricedTxMeter.Mark(1)
+
+			fmt.Println(time.Now().String()[11:25], "[G subnet-evm] pool.removeTx(tx.Hash) due to underprice", tx.Hash())
 			pool.removeTx(tx.Hash(), false)
 		}
 	}
@@ -1144,7 +1148,6 @@ func (pool *TxPool) RemoveTx(hash common.Hash) {
 	pool.mu.Lock()
 	defer pool.mu.Unlock()
 
-	fmt.Println(time.Now().String()[11:25], "[G subnet-evm] TxPool.RemoveTx", hash)
 	pool.removeTx(hash, true)
 }
 
@@ -1153,6 +1156,7 @@ func (pool *TxPool) RemoveTx(hash common.Hash) {
 func (pool *TxPool) removeTx(hash common.Hash, outofbound bool) {
 	// Fetch the transaction we wish to delete
 	tx := pool.all.Get(hash)
+	fmt.Println(time.Now().String()[11:25], "[G subnet-evm] TxPool.removeTx", hash, tx)
 	if tx == nil {
 		return
 	}
@@ -1675,6 +1679,7 @@ func (pool *TxPool) truncateQueue() {
 		// Drop all transactions if they are less than the overflow
 		if size := uint64(list.Len()); size <= drop {
 			for _, tx := range list.Flatten() {
+				fmt.Println(time.Now().String()[11:25], "[G subnet-evm] pool.removeTx(tx.Hash) due to truncateQueue size <= drop", tx.Hash())
 				pool.removeTx(tx.Hash(), true)
 			}
 			drop -= size
@@ -1684,6 +1689,7 @@ func (pool *TxPool) truncateQueue() {
 		// Otherwise drop only last few transactions
 		txs := list.Flatten()
 		for i := len(txs) - 1; i >= 0 && drop > 0; i-- {
+			fmt.Println(time.Now().String()[11:25], "[G subnet-evm] pool.removeTx(tx.Hash) due to truncateQueue drop > 0", txs[i].Hash())
 			pool.removeTx(txs[i].Hash(), true)
 			drop--
 			queuedRateLimitMeter.Mark(1)
